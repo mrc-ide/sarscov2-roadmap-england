@@ -1,0 +1,18 @@
+script: script.R
+
+artefacts:
+  - data:
+      description: Tables of outputs
+      filenames:
+        - uk_rtm.csv
+        - serology_for_inference.csv
+        - parameters_prior.csv
+        - spim_parameters.rds
+        - data_vaccination.csv
+  
+resources:
+  - uk_rtm.csv
+  - serology_for_inference.csv
+  - parameters_prior.csv
+  - spim_parameters.rds
+  - data_vaccination.csv

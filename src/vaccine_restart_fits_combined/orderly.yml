@@ -1,0 +1,132 @@
+script: script.R
+
+parameters:
+  assumptions: ~
+  short_run:
+    default: false
+  kernel_scaling:
+    default: 1
+
+artefacts:
+  - data:
+      description: Files for external reviews
+      filenames:
+        - outputs/parameters/proposal.csv
+        - outputs/parameters/prior.csv
+        - outputs/parameters/info.csv
+        - outputs/mean_admissions_by_age.csv
+        - regional_results/Rt_england.rds
+        - regional_results/Rt_all.rds
+        - regional_results/multivariant_Rt_england.rds
+        - regional_results/multivariant_Rt_all.rds
+        - outputs/aggregated_data.rds
+        - outputs/ifr_t.rds
+        - outputs/current_rt_multivariant.csv
+        - outputs/current_Reff_multivariant.csv
+
+  - data:
+      description: Files for forward simulation
+      filenames:
+        - outputs/combined.rds
+        - outputs/combined_2021-03-09.rds
+        - outputs/combined_2021-06-21.rds
+        - outputs/combined_2021-07-19.rds
+
+  - data:
+      description: Files for the plots, re-exported from above
+      filenames:
+        - regional_results/london/fit.rds
+        - regional_results/london/restart.rds
+        - regional_results/east_of_england/fit.rds
+        - regional_results/east_of_england/restart.rds
+        - regional_results/midlands/fit.rds
+        - regional_results/midlands/restart.rds
+        - regional_results/north_east_and_yorkshire/fit.rds
+        - regional_results/north_east_and_yorkshire/restart.rds
+        - regional_results/north_west/fit.rds
+        - regional_results/north_west/restart.rds
+        - regional_results/south_east/fit.rds
+        - regional_results/south_east/restart.rds
+        - regional_results/south_west/fit.rds
+        - regional_results/south_west/restart.rds
+
+  - staticgraph:
+      description: regional fitting plots for comparison
+      filenames:
+        - figs/admissions_demo.png
+        - figs/beta.png
+        - figs/data_fits.png
+        - figs/forest_plot.png
+        - figs/IFR_t_all.png
+        - figs/IFR_t_all_no_vacc.png
+        - figs/IFR_t_general.png
+        - figs/IFR_t_general_no_vacc.png
+        - figs/incidence.png
+        - figs/incidence_per_1000.png
+        - figs/pillar2.png
+        - figs/react.png
+        - figs/Rt_all.png
+        - figs/Rt_eff_all.png
+        - figs/Rt_eff_general.png
+        - figs/Rt_general.png
+        - figs/serology_euroimmun.png
+        - figs/serology_roche_n.png
+        - figs/variant.png
+        - main_figs/regions.png
+        - main_figs/positivity.png
+        - main_figs/eff_Rt_general.png
+        - main_figs/Rt_general.png
+
+packages:
+  - sircovid
+  - spimalot
+
+sources:
+  - support.R
+
+global_resources:
+  global_util.R: rtm_inference/util_new.R
+
+depends:
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "london" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/london/fit.rds: outputs/fit.rds
+        regional_results/london/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_london.pdf: outputs/pmcmc_traceplots.pdf
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "east_of_england" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/east_of_england/fit.rds: outputs/fit.rds
+        regional_results/east_of_england/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_east_of_england.pdf: outputs/pmcmc_traceplots.pdf
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "midlands" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/midlands/fit.rds: outputs/fit.rds
+        regional_results/midlands/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_midlands.pdf: outputs/pmcmc_traceplots.pdf
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "north_east_and_yorkshire" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/north_east_and_yorkshire/fit.rds: outputs/fit.rds
+        regional_results/north_east_and_yorkshire/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_north_east_and_yorkshire.pdf: outputs/pmcmc_traceplots.pdf
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "north_west" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/north_west/fit.rds: outputs/fit.rds
+        regional_results/north_west/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_north_west.pdf: outputs/pmcmc_traceplots.pdf
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "south_east" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/south_east/fit.rds: outputs/fit.rds
+        regional_results/south_east/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_south_east.pdf: outputs/pmcmc_traceplots.pdf
+ - vaccine_restart_fits_regional:
+     id: latest(parameter:region == "south_west" && parameter:assumptions == assumptions && parameter:short_run == short_run)
+     use:
+        regional_results/south_west/fit.rds: outputs/fit.rds
+        regional_results/south_west/restart.rds: outputs/restart.rds
+        regional_figs/pmcmc_traceplots_south_west.pdf: outputs/pmcmc_traceplots.pdf

@@ -1,0 +1,26 @@
+Imports:
+  distr6,
+  dplyr,
+  dust,
+  forcats,
+  ggplot2,
+  kableExtra,
+  knitr,
+  magrittr,
+  mcstate,
+  orderly,
+  patchwork,
+  raster,
+  scales,
+  sircovid,
+  spimalot,
+  stargazer,
+  tdigest,
+  tidyr,
+  viridis
+Remotes:
+  mrc-ide/dust@v0.9.11,
+  mrc-ide/mcstate@v0.6.6,
+  mrc-ide/sircovid@v0.11.30,
+  mrc-ide/spimalot@v0.3.0,
+  vimc/orderly

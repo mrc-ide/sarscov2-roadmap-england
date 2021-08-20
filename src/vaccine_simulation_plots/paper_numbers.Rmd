@@ -1,0 +1,119 @@
+---
+title: "Report Figures"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 80)
+vax_table <- function(table_date, eligible = FALSE) {
+  df <- summary$n_protected %>%
+    dplyr::filter(analysis == "VOC Central VE",
+                  state %in% c("ever_vaccinated",
+                              "protected_against_severe_disease",
+                              "protected_against_infection",
+                              "ever_infected",
+                              "ever_infected_unvaccinated"
+                  ),
+                  date == table_date) %>%
+    dplyr::select(scenario, state, mean)
+
+  if (!eligible) {
+    df <- df %>%
+      mutate("proportion (%)" = (mean / sum(population)) * 100)
+  } else {
+    df <- df %>%
+      mutate("proportion (%)" = ((mean / sum(population)) / prop_eligible) * 100)
+  }
+
+  df %>%
+    group_by(scenario) %>%
+    mutate("proportion (%)" = round(case_when(
+      state %in% c("ever_infected", "ever_infected_unvaccinated") ~ `proportion (%)`,
+      TRUE ~ `proportion (%)` + min(`proportion (%)`)), 2)) %>%
+  ungroup() %>%
+  arrange(desc(scenario), desc(`proportion (%)`)) %>%
+  kable(format.args = list(big.mark = ",")) %>%
+  kable_styling(full_width = TRUE)
+}
+end_date <- as.Date("2022-06-01")
+```
+
+# Abstract
+
+### Transmission advantage
+
+```{r}
+fits <- fits_central_combined$simulate
+rt <- fits$Rt_general[, "england", length(fits$date), ]
+transmission_advantage <- rt[, "strain_2"] / rt[, "strain_1"]
+round(mean_ci(transmission_advantage), 2)
+```
+
+### Total deaths
+
+```{r}
+rmarkdown::paged_table(
+  summary_state %>%
+    dplyr::filter(date == end_date,
+                  analysis == "VOC Central VE",
+                adherence_to_baseline_npis == "central",
+                state == "Total additional COVID-19 deaths") %>%
+    dplyr::select(scenario, date, `50%`, `2.5%`, `97.5%`) %>%
+    dplyr::mutate(
+      `2.5%` = dplyr::if_else(grepl("July", scenario),
+                              `2.5%` + deaths_21jun_18jul[["2.5%"]], `2.5%`),
+      `50%` = dplyr::if_else(grepl("July", scenario),
+                              `50%` + deaths_21jun_18jul[["50%"]], `50%`),
+      `97.5%` = dplyr::if_else(grepl("July", scenario),
+                              `97.5%` + deaths_21jun_18jul[["97.5%"]], `97.5%`)
+    )
+)
+```
+
+# Results
+
+### Cases due to delta on 14th June
+
+```{r}
+
+prop_delta <- 1 - agg_data$strain_non_variant / agg_data$strain_tot
+round(prop_delta[agg_data$date == "2021-06-14"], 3)
+
+```
+
+### Reff on 14th June
+
+```{r}
+summary_fits$state %>%
+  dplyr::filter(date == "2021-06-14",
+                state == "eff_Rt_general_both") %>%
+  dplyr::select(assumptions, `50%`, `2.5%`, `97.5%`) %>%
+  rmarkdown::paged_table()
+```
+
+### Deaths low-high assumptions
+
+```{r}
+
+summary_state %>%
+  dplyr::filter(state == "Total additional COVID-19 deaths",
+                (scenario == "JuneGradual [Low R]" & analysis == "VOC High VE") |
+                  (scenario == "JuneGradual [High R]" & analysis == "VOC Low VE"),
+                date == end_date) %>%
+  dplyr::select(analysis, scenario, date, `50%`, `2.5%`, `97.5%`) %>%
+  rmarkdown::paged_table()
+```
+
+### Hospital admissions
+
+```{r}
+summary_state %>%
+  dplyr::filter(state == "Daily hospital admissions",
+                scenario %in% c("June-21", "JuneGradual", "July-19", "JulyGradual"),
+                analysis == "VOC Central VE") %>%
+  group_by(analysis, scenario) %>%
+  dplyr::filter(`50%` == max(`50%`, na.rm = TRUE)) %>%
+  dplyr::select(analysis, scenario, date, `50%`, `2.5%`, `97.5%`) %>%
+  rmarkdown::paged_table()
+```

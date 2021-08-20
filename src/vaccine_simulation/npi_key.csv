@@ -1,0 +1,5 @@
+nation,npi,Rt,Rt_sd,adherence
+england,step_3,1.38,0.25,central
+england,full_lift,2.53,0.375,central
+england,full_lift,3.22,0.375,low
+england,full_lift,2.07,0.375,high

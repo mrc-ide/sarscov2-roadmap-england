@@ -1,0 +1,5 @@
+data
+parameters/prior.csv
+parameters/spim.rds
+outputs
+global_*

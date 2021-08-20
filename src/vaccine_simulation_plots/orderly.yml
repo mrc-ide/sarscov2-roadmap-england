@@ -1,0 +1,149 @@
+script: script.R
+
+parameters:
+  short_run: ~
+  n_par: ~
+  kernel_scaling: ~
+
+packages:
+  - tidyr
+  - ggplot2
+  - dplyr
+  - tdigest
+  - patchwork
+  - knitr
+  - forcats
+  - raster
+  - scales
+  - kableExtra
+  - stargazer
+
+artefacts:
+  - data:
+      description: Paper numbers
+      filenames:
+        - paper_numbers.html
+
+  - data:
+      description: outputs
+      filenames:
+        - outputs/peak_states.csv
+        - outputs/peak_states.tex
+
+  - data:
+      description: Figures
+      filenames:
+        - figs/figure1.jpg
+        - figs/figure1_A.jpg
+        - figs/figure1_B.jpg
+        - figs/figure1_C.jpg
+        - figs/figure1_D.jpg
+        - figs/figure1_E.jpg
+        - figs/figure1_F.jpg
+
+        - figs/figure2.jpg
+        - figs/figure2_A.jpg
+        - figs/figure2_B.jpg
+
+        - figs/figure3.jpg
+        - figs/figure3_A1.jpg
+        - figs/figure3_A2.jpg
+        - figs/figure3_A3.jpg
+        - figs/figure3_B1.jpg
+        - figs/figure3_B2.jpg
+        - figs/figure3_B3.jpg
+        - figs/figure3_C1.jpg
+        - figs/figure3_C2.jpg
+        - figs/figure3_C3.jpg
+        - figs/figure3_D1.jpg
+        - figs/figure3_D2.jpg
+        - figs/figure3_D3.jpg
+
+        - figs/figureSI_prop.jpg
+        - figs/figureSI_traj.jpg
+        - figs/figureSI_vax.jpg
+
+sources:
+  - support.R
+  - plots.R
+
+resources:
+ - paper_numbers.Rmd
+ - uk_rtm.csv
+
+global_resources:
+  global_util.R: rtm_inference/util_new.R
+
+depends:
+  - vaccine_fits_combined:
+      id: latest(parameter:assumptions == "central" && parameter:short_run == short_run && parameter:kernel_scaling == kernel_scaling)
+      use:
+        parent_fits.rds: outputs/combined.rds
+
+  ## Identical in all scenarios
+  - vaccine_restart_fits_combined:
+      id: latest(parameter:assumptions == "central" && parameter:short_run == short_run && parameter:kernel_scaling == kernel_scaling)
+      use:
+        fits_central_combined.rds: outputs/combined.rds
+        dat/london/fit.rds: regional_results/london/fit.rds
+        dat/london/restart.rds: regional_results/london/restart.rds
+        dat/east_of_england/fit.rds: regional_results/east_of_england/fit.rds
+        dat/east_of_england/restart.rds: regional_results/east_of_england/restart.rds
+        dat/midlands/fit.rds: regional_results/midlands/fit.rds
+        dat/midlands/restart.rds: regional_results/midlands/restart.rds
+        dat/north_east_and_yorkshire/fit.rds: regional_results/north_east_and_yorkshire/fit.rds
+        dat/north_east_and_yorkshire/restart.rds: regional_results/north_east_and_yorkshire/restart.rds
+        dat/north_west/fit.rds: regional_results/north_west/fit.rds
+        dat/north_west/restart.rds: regional_results/north_west/restart.rds
+        dat/south_east/fit.rds: regional_results/south_east/fit.rds
+        dat/south_east/restart.rds: regional_results/south_east/restart.rds
+        dat/south_west/fit.rds: regional_results/south_west/fit.rds
+        dat/south_west/restart.rds: regional_results/south_west/restart.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'central' && parameter:restart_date == 'june' && parameter:sensitivity == FALSE)
+      use:
+        summary_cen_june.rds: outputs/summary.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'central' && parameter:restart_date == 'july' && parameter:sensitivity == FALSE)
+      use:
+        summary_cen_july.rds: outputs/summary.rds
+        summary_restart_cen.rds: outputs/summary_restart.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'central' && parameter:restart_date == 'march' && parameter:sensitivity == FALSE)
+      use:
+        summary_cen_march.rds: outputs/summary.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'optimistic' && parameter:restart_date == 'june' && parameter:sensitivity == FALSE)
+      use:
+        summary_opt_june.rds: outputs/summary.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'optimistic' && parameter:restart_date == 'july' && parameter:sensitivity == FALSE)
+      use:
+        summary_opt_july.rds: outputs/summary.rds
+        summary_restart_opt.rds: outputs/summary_restart.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'optimistic' && parameter:restart_date == 'march' && parameter:sensitivity == FALSE)
+      use:
+        summary_opt_march.rds: outputs/summary.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'pessimistic' && parameter:restart_date == 'june' && parameter:sensitivity == FALSE)
+      use:
+        summary_pes_june.rds: outputs/summary.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'pessimistic' && parameter:restart_date == 'july' && parameter:sensitivity == FALSE)
+      use:
+        summary_pes_july.rds: outputs/summary.rds
+        summary_restart_pes.rds: outputs/summary_restart.rds
+
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == 'pessimistic' && parameter:restart_date == 'march' && parameter:sensitivity == FALSE)
+      use:
+        summary_pes_march.rds: outputs/summary.rds

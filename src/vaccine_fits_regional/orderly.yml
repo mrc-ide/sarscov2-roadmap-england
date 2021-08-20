@@ -1,0 +1,52 @@
+script: script.R
+
+parameters:
+    short_run:
+      default: false
+    chains:
+      default: 3
+    region:
+      default: london
+    assumptions: ~
+    kernel_scaling:
+      default: 0.2
+    n_mcmc:
+      default: 1500
+
+artefacts:
+  - staticgraph:
+      description: pMCMC trace plots
+      filenames:
+        - outputs/pmcmc_traceplots.pdf
+  - data:
+      description: PMCMC results for combined task
+      filenames:
+        - outputs/fit.rds
+        - outputs/restart.rds
+
+global_resources:
+  global_util.R: rtm_inference/util_new.R
+  
+resources:
+  - data/support_age_profile.csv
+  - parameters/central/info.csv
+  - parameters/central/proposal.csv
+  - parameters/optimistic/info.csv
+  - parameters/optimistic/proposal.csv
+  - parameters/pessimistic/info.csv
+  - parameters/pessimistic/proposal.csv
+
+packages:
+  - sircovid
+  - spimalot
+
+depends:
+  # Incoming data:
+  vaccine_fits_data:
+    id: latest
+    use:
+      data/rtm.csv: uk_rtm.csv
+      data/serology.csv: serology_for_inference.csv
+      data/vaccination.csv: data_vaccination.csv
+      parameters/prior.csv: parameters_prior.csv
+      parameters/spim.rds: spim_parameters.rds

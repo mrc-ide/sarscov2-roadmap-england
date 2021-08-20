@@ -1,0 +1,66 @@
+script: script.R
+
+parameters:
+  short_run: ~
+  n_par: ~
+  n_threads: ~
+  rrq: ~
+  assumptions: ~
+  sensitivity: ~
+  kernel_scaling: ~
+  restart_date: ~
+
+packages:
+  - tidyr
+  - magrittr
+  - ggplot2
+  - tdigest
+  - distr6
+  - viridis
+  - dplyr
+  - spimalot
+
+artefacts:
+  - data:
+      description: Overall data for the uk
+      filenames:
+        - outputs/summary.rds
+        - outputs/summary_restart.rds
+        - npi_key.csv
+        - schools_schedule.csv
+        - Rt_future.csv
+        - run_grid_final.csv
+        - rt_values.csv
+        - outputs/npi_pars.csv
+        - outputs/complete_second_doses.csv
+        - outputs/uptake_simulation_date.csv
+        - outputs/uptake_2022-06-01.csv
+
+resources:
+  - npi_key.csv
+  - schools_schedule.csv
+
+global_resources:
+  global_util.R: rtm_inference/util_new.R
+
+sources:
+  - support.R
+
+depends:
+  - vaccine_restart_fits_combined:
+      id: latest(parameter:assumptions == assumptions && parameter:short_run == short_run && parameter:kernel_scaling == kernel_scaling)
+      use:
+        combined_final.rds: outputs/combined.rds
+        combined_march.rds: outputs/combined_2021-03-09.rds
+        combined_june.rds: outputs/combined_2021-06-21.rds
+        combined_july.rds: outputs/combined_2021-07-19.rds
+
+  - vaccine_fits_combined:
+      id: latest(parameter:assumptions == assumptions && parameter:short_run == short_run && parameter:kernel_scaling == kernel_scaling)
+      use:
+        fits_combined.rds: outputs/combined.rds
+
+  - vaccine_fits_data:
+      id: latest
+      use:
+        spim_parameters.rds: spim_parameters.rds

@@ -1,0 +1,5 @@
+s_gene_region.csv
+vaccination_parameters.rds
+restart.rds
+global_*.R
+outputs

@@ -1,0 +1,54 @@
+script: script.R
+
+parameters:
+  short_run: ~
+  n_par: ~
+  kernel_scaling: ~
+
+packages:
+  - tidyr
+  - ggplot2
+  - dplyr
+  - patchwork
+  - scales
+  - spimalot
+
+artefacts:
+  - data:
+      description: Central
+      filenames:
+        - figs/varimp_cen.jpg
+        - figs/varimp_deaths_cen.jpg
+        - figs/varimp_adm_cen.jpg
+        - figs/varimp_inf_cen.jpg
+        - figs/shaps.jpg
+        - figs/boxplots.jpg
+  - data:
+      description: Sens
+      filenames:
+        - figs/varimp_pes.jpg
+        - figs/varimp_opt.jpg
+        - figs/varimp_deaths_pes.jpg
+        - figs/varimp_adm_pes.jpg
+        - figs/varimp_inf_pes.jpg
+        - figs/varimp_deaths_opt.jpg
+        - figs/varimp_adm_opt.jpg
+        - figs/varimp_inf_opt.jpg
+
+sources:
+  - plots.R
+  - support.R
+
+depends:
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == "central" && parameter:restart_date == "july" && parameter:sensitivity == TRUE)
+      use:
+        summary_cen.rds: outputs/summary.rds
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == "pessimistic" && parameter:restart_date == "july" && parameter:sensitivity == TRUE)
+      use:
+        summary_pes.rds: outputs/summary.rds
+  - vaccine_simulation:
+      id: latest(parameter:short_run == short_run && parameter:n_par == n_par && parameter:kernel_scaling == kernel_scaling && parameter:assumptions == "optimistic" && parameter:restart_date == "july" && parameter:sensitivity == TRUE)
+      use:
+        summary_opt.rds: outputs/summary.rds
